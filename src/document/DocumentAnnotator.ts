@@ -3,8 +3,9 @@ import BaseManager from '../common/BaseManager';
 import { centerRegion, isRegion, RegionManager } from '../region';
 import { Event } from '../@types';
 import { getAnnotation } from '../store/annotations';
+import { getSelections } from './docUtil';
 import { HighlightManager } from '../highlight';
-import { Mode } from '../store';
+import { Mode, setSelectionAction } from '../store';
 import { scrollToLocation } from '../utils/scroll';
 import './DocumentAnnotator.scss';
 
@@ -17,6 +18,17 @@ export default class DocumentAnnotator extends BaseAnnotator {
         super(options);
 
         this.addListener(Event.ANNOTATIONS_MODE_CHANGE, this.handleChangeMode);
+    }
+
+    init(scale = 1, rotation = 0): void {
+        super.init(scale, rotation);
+
+        if (!this.annotatedEl) {
+            return;
+        }
+
+        this.annotatedEl.addEventListener('mousedown', this.handleMouseDown);
+        this.annotatedEl.addEventListener('mouseup', this.handleMouseUp);
     }
 
     getAnnotatedElement(): HTMLElement | null | undefined {
@@ -75,6 +87,16 @@ export default class DocumentAnnotator extends BaseAnnotator {
         } else {
             this.annotatedEl.classList.remove('ba-is-highlighting');
         }
+    };
+
+    handleMouseDown = (): void => {
+        this.store.dispatch(setSelectionAction(null));
+    };
+
+    handleMouseUp = (): void => {
+        setTimeout(() => {
+            this.store.dispatch(setSelectionAction(getSelections()));
+        }, 300); // Pdf.js textLayer enhancement waits 300ms (yes, they hardcoded this magic number)
     };
 
     render(): void {
