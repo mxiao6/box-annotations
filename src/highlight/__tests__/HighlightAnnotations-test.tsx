@@ -10,6 +10,7 @@ describe('components/highlight/HighlightAnnotations', () => {
     const defaults = {
         activeAnnotationId: null,
         isCreating: false,
+        pageEl: document.createElement('div'),
         setActiveAnnotationId: jest.fn(),
     };
 
@@ -23,13 +24,6 @@ describe('components/highlight/HighlightAnnotations', () => {
 
             expect(wrapper.find(HighlightList).exists()).toBe(true);
             expect(creator.hasClass('ba-HighlightAnnotations-creator')).toBe(true);
-        });
-
-        test('should not render creation components if not in creation mode', () => {
-            const wrapper = getWrapper({ isCreating: false });
-
-            expect(wrapper.find(HighlightList).exists()).toBe(true);
-            expect(wrapper.exists(HighlightCreator)).toBe(false);
         });
     });
 

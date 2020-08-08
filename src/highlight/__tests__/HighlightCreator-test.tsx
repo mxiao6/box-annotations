@@ -3,7 +3,15 @@ import { shallow, ShallowWrapper } from 'enzyme';
 import HighlightCreator from '../HighlightCreator';
 
 describe('HighlightCreator', () => {
-    const getWrapper = (props = {}): ShallowWrapper => shallow(<HighlightCreator {...props} />);
+    const defaults = {
+        onSelectionChange: jest.fn(),
+        pageEl: document.createElement('div'),
+    };
+    const getWrapper = (props = {}): ShallowWrapper => shallow(<HighlightCreator {...defaults} {...props} />);
+
+    beforeEach(() => {
+        jest.spyOn(React, 'useEffect').mockImplementation(func => func());
+    });
 
     describe('render', () => {
         test('should add class', () => {

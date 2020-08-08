@@ -4,6 +4,7 @@ import RegionManager from '../../region/RegionManager';
 import { Annotation, Event } from '../../@types';
 import { annotations as regions } from '../../region/__mocks__/data';
 import { fetchAnnotationsAction } from '../../store';
+import { HighlightManager } from '../../highlight';
 import { scrollToLocation } from '../../utils/scroll';
 
 jest.mock('../../highlight/HighlightManager');
@@ -88,7 +89,8 @@ describe('DocumentAnnotator', () => {
             const managers = annotator.getPageManagers(getPage());
             const managerIterator = managers.values();
 
-            expect(managers.size).toBe(1);
+            expect(managers.size).toBe(2);
+            expect(managerIterator.next().value).toBeInstanceOf(HighlightManager);
             expect(managerIterator.next().value).toBeInstanceOf(RegionManager);
         });
 

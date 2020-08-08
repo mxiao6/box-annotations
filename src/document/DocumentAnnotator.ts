@@ -6,6 +6,7 @@ import { getAnnotation } from '../store/annotations';
 import { Mode } from '../store';
 import { scrollToLocation } from '../utils/scroll';
 import './DocumentAnnotator.scss';
+import { HighlightManager } from '../highlight';
 
 export default class DocumentAnnotator extends BaseAnnotator {
     annotatedEl?: HTMLElement;
@@ -37,6 +38,7 @@ export default class DocumentAnnotator extends BaseAnnotator {
 
         // Lazily instantiate managers as pages are added or re-rendered
         if (managers.size === 0) {
+            managers.add(new HighlightManager({ location: pageNumber, pageEl, referenceEl: pageReferenceEl }));
             managers.add(new RegionManager({ location: pageNumber, referenceEl: pageReferenceEl }));
         }
 
