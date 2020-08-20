@@ -1,4 +1,4 @@
-import { createAction } from '@reduxjs/toolkit';
+import { createAction, PayloadAction } from '@reduxjs/toolkit';
 import { DOMRectMini, SelectionItem } from './types';
 
 export type SelectionArg = {
@@ -37,3 +37,6 @@ export const setSelectionAction = createAction(
         };
     },
 );
+
+export const clearSelectionAction = (): PayloadAction<SelectionItem | null, 'SET_SELECTION'> =>
+    setSelectionAction(null);
