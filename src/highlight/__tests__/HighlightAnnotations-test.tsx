@@ -20,11 +20,13 @@ describe('HighlightAnnotations', () => {
     const defaults = {
         activeAnnotationId: null,
         annotations: [],
+        clearSelection: jest.fn(),
         createHighlight: jest.fn(),
         isCreating: false,
         location: 1,
         message: 'test',
         resetCreator: jest.fn(),
+        selection: null,
         setActiveAnnotationId: jest.fn(),
         setMessage: jest.fn(),
         setMode: jest.fn(),

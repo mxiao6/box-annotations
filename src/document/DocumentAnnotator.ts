@@ -34,6 +34,7 @@ export default class DocumentAnnotator extends BaseAnnotator {
 
         this.removeListener(Event.ANNOTATIONS_MODE_CHANGE, this.handleChangeMode);
         document.removeEventListener('selectionchange', this.debounceHandleSelectionChange);
+        this.getPages().forEach(pageEl => pageEl.removeEventListener('mouseup', this.handleSelectionChange));
 
         super.destroy();
     }
@@ -138,6 +139,8 @@ export default class DocumentAnnotator extends BaseAnnotator {
         );
 
         this.managers.set(pageNumber, pageManagers);
+
+        pageEl.addEventListener('mouseup', this.handleSelectionChange);
     }
 
     scrollToAnnotation(annotationId: string | null): void {
