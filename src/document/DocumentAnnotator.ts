@@ -12,8 +12,8 @@ import './DocumentAnnotator.scss';
 
 // Pdf.js textLayer enhancement requires waiting for 300ms (they hardcode this magic number)
 const TEXT_LAYER_ENHANCEMENT = 300;
-// Selection change event is quite noisy, debounce it to avoid unnessary selection changes in store
-const SELECTION_CHANGE_DEBOUNCE = 100;
+// Wait 500ms for keyboard selection
+const SELECTION_CHANGE_DEBOUNCE = 500;
 
 export default class DocumentAnnotator extends BaseAnnotator {
     annotatedEl?: HTMLElement;
@@ -21,6 +21,10 @@ export default class DocumentAnnotator extends BaseAnnotator {
     managers: Map<number, Set<BaseManager>> = new Map();
 
     selectionChangeTimer?: number;
+
+    isMouseSelecting = false;
+
+    mouseEventHandlerAdded = false;
 
     constructor(options: Options) {
         super(options);
@@ -35,6 +39,11 @@ export default class DocumentAnnotator extends BaseAnnotator {
         this.removeListener(Event.ANNOTATIONS_MODE_CHANGE, this.handleChangeMode);
         document.removeEventListener('selectionchange', this.debounceHandleSelectionChange);
         this.getPages().forEach(pageEl => pageEl.removeEventListener('mouseup', this.handleSelectionChange));
+
+        if (this.mouseEventHandlerAdded && this.annotatedEl) {
+            this.annotatedEl.addEventListener('mousedown', this.handleMouseDown);
+            this.annotatedEl.addEventListener('mouseup', this.handleMouseUp);
+        }
 
         super.destroy();
     }
@@ -87,6 +96,21 @@ export default class DocumentAnnotator extends BaseAnnotator {
         return this.annotatedEl ? Array.from(this.annotatedEl.querySelectorAll('.page')) : [];
     }
 
+    handleMouseDown = (): void => {
+        this.isMouseSelecting = true;
+
+        clearTimeout(this.selectionChangeTimer);
+        this.store.dispatch(setSelectionAction(null));
+    };
+
+    handleMouseUp = (): void => {
+        this.isMouseSelecting = false;
+
+        this.selectionChangeTimer = window.setTimeout(() => {
+            this.store.dispatch(setSelectionAction(getSelection()));
+        }, TEXT_LAYER_ENHANCEMENT);
+    };
+
     handleChangeMode = ({ mode }: { mode: Mode }): void => {
         if (!this.annotatedEl) {
             return;
@@ -100,26 +124,23 @@ export default class DocumentAnnotator extends BaseAnnotator {
     };
 
     handleSelectionChange = (): void => {
-        // Clear previous selection immediately
-        this.store.dispatch(setSelectionAction(null));
-        clearTimeout(this.selectionChangeTimer);
+        if (this.isMouseSelecting) {
+            return;
+        }
 
-        this.selectionChangeTimer = window.setTimeout(() => {
-            this.store.dispatch(setSelectionAction(getSelection()));
-        }, TEXT_LAYER_ENHANCEMENT);
+        this.store.dispatch(setSelectionAction(getSelection()));
     };
 
-    debounceHandleSelectionChange = debounce(this.handleSelectionChange, SELECTION_CHANGE_DEBOUNCE, {
-        // The previous selection needs to be cleared immediately when selection changes
-        // Below options make sure the function is triggered on the leading edge of the timeout,
-        // instead of on the trailing edge
-        leading: true,
-        trailing: false,
-    });
+    debounceHandleSelectionChange = debounce(this.handleSelectionChange, SELECTION_CHANGE_DEBOUNCE);
 
     render(): void {
         // Clear previous selection
         this.store.dispatch(setSelectionAction(null));
+
+        if (!this.mouseEventHandlerAdded && this.annotatedEl) {
+            this.annotatedEl.addEventListener('mousedown', this.handleMouseDown);
+            this.annotatedEl.addEventListener('mouseup', this.handleMouseUp);
+        }
 
         this.getPages()
             .filter(({ dataset }) => dataset.loaded && dataset.pageNumber)
