@@ -7,5 +7,6 @@ export type SelectionState = {
 export type SelectionItem = {
     boundingRect: DOMRectMini;
     location: number;
+    pageRect: DOMRectMini;
     rects: Array<DOMRectMini>;
 };

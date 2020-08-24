@@ -3,6 +3,7 @@ import { DOMRectMini, SelectionItem } from './types';
 
 export type CreateArg = {
     location: number;
+    pageRect: DOMRect;
     range: Range;
 };
 
@@ -26,12 +27,13 @@ export const setSelectionAction = createAction(
             };
         }
 
-        const { location, range } = arg;
+        const { location, pageRect, range } = arg;
 
         return {
             payload: {
                 boundingRect: getDOMRectMini(range.getBoundingClientRect()),
                 location,
+                pageRect: getDOMRectMini(pageRect),
                 rects: Array.from(range.getClientRects()).map(getDOMRectMini),
             },
         };

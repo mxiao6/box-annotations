@@ -43,7 +43,7 @@ const options: Partial<Options> = {
     placement: 'bottom',
 };
 
-export default function PopupCursor({ onClick = noop, rect }: Props): JSX.Element {
+export default function PopupHighlight({ onClick = noop, rect }: Props): JSX.Element {
     const buttonRef = React.useRef<HTMLButtonElement>(null);
     const { x, y, height, width } = rect;
 
@@ -73,11 +73,13 @@ export default function PopupCursor({ onClick = noop, rect }: Props): JSX.Elemen
         const { current: buttonEl } = buttonRef;
 
         if (buttonEl) {
+            buttonEl.addEventListener('mousedown', handleEvent);
             buttonEl.addEventListener('mouseup', handleEvent);
         }
 
         return () => {
             if (buttonEl) {
+                buttonEl.removeEventListener('mousedown', handleEvent);
                 buttonEl.removeEventListener('mouseup', handleEvent);
             }
         };
