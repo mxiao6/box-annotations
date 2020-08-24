@@ -7,9 +7,9 @@ import HighlightSvg from './HighlightSvg';
 import HighlightTarget from './HighlightTarget';
 import PopupHighlight from '../components/Popups/PopupHighlight';
 import PopupReply from '../components/Popups/PopupReply';
-import { AnnotationHighlight } from '../@types';
+import { AnnotationHighlight, Rect } from '../@types';
 import { CreateArg } from './actions';
-import { CreatorItemHighlight, CreatorStatus, Mode, SelectionArg, SelectionItem } from '../store';
+import { CreatorItemHighlight, CreatorStatus, DOMRectMini, Mode, SelectionArg, SelectionItem } from '../store';
 import './HighlightAnnotations.scss';
 
 type Props = {
@@ -43,6 +43,9 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         setActiveAnnotationId,
         setSelection,
         setMessage,
+        setMode,
+        setStaged,
+        setStatus,
         staged,
         status,
     } = props;
@@ -71,7 +74,52 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         createHighlight({ ...staged, message });
     };
 
+    const filterRects = (rectList: DOMRectMini[]): DOMRectMini[] => {
+        const rects: DOMRectMini[] = [];
+
+        // Deduplicate similar rects
+        rectList.forEach(curr => {
+            const prev = rects.pop();
+            // empty list, push current
+            if (!prev) {
+                rects.push(curr);
+                return;
+            }
+
+            // different rects, push both
+            if (prev.x !== curr.x || prev.width !== curr.width || Math.abs(prev.y - curr.y) > 2) {
+                rects.push(prev);
+                rects.push(curr);
+                return;
+            }
+
+            // the same rect, push the larger one
+            rects.push(prev.height > curr.height ? prev : curr);
+        });
+
+        return rects;
+    };
+
     const handlePromote = (): void => {
+        if (!selection) {
+            return;
+        }
+
+        const { location, pageRect, rects } = selection;
+        const { height: pageHeight, width: pageWidth, x: pageX, y: pageY } = pageRect;
+
+        const shapes: Rect[] = filterRects(rects).map(({ height, width, x, y }) => ({
+            height: (height / pageHeight) * 100,
+            type: 'rect',
+            width: (width / pageWidth) * 100,
+            x: ((x - pageX) / pageWidth) * 100,
+            y: ((y - pageY) / pageHeight) * 100,
+        }));
+
+        setMode(Mode.HIGHLIGHT);
+        setStaged({ location, shapes });
+        setStatus(CreatorStatus.staged);
+
         setSelection(null);
     };
 

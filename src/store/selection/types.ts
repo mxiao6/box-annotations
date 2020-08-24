@@ -7,5 +7,6 @@ export type SelectionState = {
 export type SelectionItem = {
     boundingRect: Shape;
     location: number;
+    pageRect: Shape;
     rects: Array<Shape>;
 };

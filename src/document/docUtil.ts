@@ -1,6 +1,7 @@
 type Selection = {
-    range: Range;
     location: number;
+    pageRect: DOMRect;
+    range: Range;
 };
 
 /**
@@ -19,11 +20,11 @@ export function findClosestElWithClass(element: Element | null, className: strin
 /**
  * Returns the page element and page number that the element is on.
  */
-export function getPageNumber(element: Element | null): number | undefined {
+export function getPageInfo(element: Element | null): { page: number | undefined; pageEl: Element | null } {
     const pageEl = findClosestElWithClass(element, 'page');
     const pageNumber = pageEl && pageEl.getAttribute('data-page-number');
 
-    return pageNumber ? parseInt(pageNumber, 10) : undefined;
+    return { page: pageNumber ? parseInt(pageNumber, 10) : undefined, pageEl };
 }
 
 export function getRange(): Range | null {
@@ -44,12 +45,12 @@ export function getSelection(): Selection | null {
         return null;
     }
 
-    const startPage = getPageNumber(range.startContainer as Element);
-    const endPage = getPageNumber(range.endContainer as Element);
+    const { page: startPage } = getPageInfo(range.startContainer as Element);
+    const { page: endPage, pageEl } = getPageInfo(range.endContainer as Element);
 
-    if (!startPage || !endPage || startPage !== endPage) {
+    if (!pageEl || !startPage || !endPage || startPage !== endPage) {
         return null;
     }
 
-    return { range, location: endPage };
+    return { location: endPage, pageRect: pageEl.getBoundingClientRect(), range };
 }

@@ -4,6 +4,7 @@ import { Shape } from '../../@types';
 
 export type SelectionArg = {
     location: number;
+    pageRect: DOMRect;
     range: Range;
 };
 
@@ -27,12 +28,13 @@ export const setSelectionAction = createAction(
             };
         }
 
-        const { location, range } = arg;
+        const { location, pageRect, range } = arg;
 
         return {
             payload: {
                 boundingRect: getShape(range.getBoundingClientRect()),
                 location,
+                pageRect: getShape(pageRect),
                 rects: Array.from(range.getClientRects()).map(getShape),
             },
         };
