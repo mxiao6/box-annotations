@@ -100,9 +100,9 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         return rects;
     };
 
-    const handlePromote = (): void => {
+    const getStaged = (): CreatorItemHighlight | null => {
         if (!selection) {
-            return;
+            return null;
         }
 
         const { location, pageRect, rects } = selection;
@@ -116,12 +116,31 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
             y: ((y - pageY) / pageHeight) * 100,
         }));
 
+        return { location, shapes };
+    };
+
+    const handlePromote = (): void => {
+        if (!selection) {
+            return;
+        }
+
         setMode(Mode.HIGHLIGHT);
-        setStaged({ location, shapes });
+        setStaged(getStaged());
         setStatus(CreatorStatus.staged);
 
         setSelection(null);
     };
+
+    React.useEffect(() => {
+        if (!isCreating || !selection) {
+            return;
+        }
+
+        setStaged(getStaged());
+        setStatus(CreatorStatus.staged);
+
+        clearSelection();
+    }, [isCreating, selection]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <>
