@@ -28,11 +28,12 @@ export function getPageNumber(element: Element | null): number | undefined {
 
 export function getRange(): Range | null {
     const selection = window.getSelection();
-    if (!selection || selection.type !== 'Range' || selection.isCollapsed) {
+    if (!selection || selection.type !== 'Range' || selection.isCollapsed || !selection.rangeCount) {
         return null;
     }
 
-    return selection.getRangeAt(0);
+    // return the last range
+    return selection.getRangeAt(selection.rangeCount - 1);
 }
 
 export function getSelection(): Selection | null {
