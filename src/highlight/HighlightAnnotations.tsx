@@ -107,7 +107,12 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
                 </div>
             )}
 
-            {!isCreating && selection && <PopupHighlight onClick={handlePromote} rect={selection.boundingRect} />}
+            {/* Layer 4: Annotations promoter to promote selection to staged */}
+            {!isCreating && selection && (
+                <div className="ba-HighlightAnnotations-promoterPopup">
+                    <PopupHighlight onClick={handlePromote} rect={selection.boundingRect} />
+                </div>
+            )}
         </>
     );
 };

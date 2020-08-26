@@ -1,14 +1,13 @@
 @import '~box-ui-elements/es/styles/variables';
+@import './popup-arrow';
 
 .ba {
     $popup-arrow-height: 3px;
-    $popup-arror-width: 4px;
+    $popup-arrow-width: 4px;
     $popup-content-bg: $bdl-gray;
     $popup-icon-margin: 8px;
 
     .ba-PopupHighlight {
-        pointer-events: auto;
-
         // Top-facing arrows
         &[data-popper-placement*='bottom'] {
             .ba-Popup-arrow {
@@ -17,11 +16,7 @@
         }
 
         .ba-Popup-arrow {
-            &::before {
-                border-top: $popup-arrow-height solid $popup-content-bg;
-                border-right: $popup-arror-width solid transparent;
-                border-left: $popup-arror-width solid transparent;
-            }
+            @include ba-Popup-arrow($popup-arrow-height, $popup-arrow-width, $popup-content-bg, $popup-content-bg);
 
             &::after {
                 display: none;
@@ -52,5 +47,9 @@
 
     .ba-PopupHighlight-icon {
         margin-right: $popup-icon-margin;
+
+        path {
+            fill: $white;
+        }
     }
 }

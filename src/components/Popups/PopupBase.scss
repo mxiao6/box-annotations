@@ -1,4 +1,5 @@
 @import '~box-ui-elements/es/styles/variables';
+@import './popup-arrow';
 
 .ba {
     $popup-arrow-size: 12px;
@@ -87,22 +88,7 @@
     }
 
     .ba-Popup-arrow {
-        &::before,
-        &::after {
-            position: absolute;
-            display: block;
-            border-right: $popup-arrow-size solid transparent;
-            border-left: $popup-arrow-size solid transparent;
-            content: '';
-        }
-
-        &::before {
-            border-top: $popup-arrow-size solid $popup-border-color;
-        }
-
-        &::after {
-            border-top: $popup-arrow-size solid $popup-content-bg;
-        }
+        @include ba-Popup-arrow($popup-arrow-size, $popup-arrow-size, $popup-content-bg, $popup-border-color);
     }
 
     .ba-Popup-content {

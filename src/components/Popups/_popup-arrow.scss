@@ -1,0 +1,18 @@
+@mixin ba-Popup-arrow($height, $width, $content-bg, $border-color) {
+    &::before,
+    &::after {
+        position: absolute;
+        display: block;
+        border-right: $width solid transparent;
+        border-left: $width solid transparent;
+        content: '';
+    }
+
+    &::before {
+        border-top: $height solid $border-color;
+    }
+
+    &::after {
+        border-top: $height solid $content-bg;
+    }
+}

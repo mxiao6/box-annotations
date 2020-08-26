@@ -1,16 +1,16 @@
 import * as React from 'react';
+import IconHighlightTextAnnotation from 'box-ui-elements/es/icon/fill/AnnotationsHighlight16';
 import noop from 'lodash/noop';
 import { FormattedMessage } from 'react-intl';
-import IconHighlightTextAnnotation from 'box-ui-elements/es/icons/annotations/IconHighlightTextAnnotation';
 import messages from './messages';
 import PopupBase from './PopupBase';
-import { DOMRectMini } from '../../store';
 import { Options } from './Popper';
+import { Shape } from '../../@types/model';
 import './PopupHighlight.scss';
 
 export type Props = {
     onClick?: (event: React.MouseEvent) => void;
-    rect: DOMRectMini;
+    rect: Shape;
 };
 
 const options: Partial<Options> = {
