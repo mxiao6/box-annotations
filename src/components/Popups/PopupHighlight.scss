@@ -1,0 +1,56 @@
+@import '~box-ui-elements/es/styles/variables';
+
+.ba {
+    $popup-arrow-height: 3px;
+    $popup-arror-width: 4px;
+    $popup-content-bg: $bdl-gray;
+    $popup-icon-margin: 8px;
+
+    .ba-PopupHighlight {
+        pointer-events: auto;
+
+        // Top-facing arrows
+        &[data-popper-placement*='bottom'] {
+            .ba-Popup-arrow {
+                top: -$popup-arrow-height;
+            }
+        }
+
+        .ba-Popup-arrow {
+            &::before {
+                border-top: $popup-arrow-height solid $popup-content-bg;
+                border-right: $popup-arror-width solid transparent;
+                border-left: $popup-arror-width solid transparent;
+            }
+
+            &::after {
+                display: none;
+            }
+        }
+
+        .ba-Popup-content {
+            background-color: $popup-content-bg;
+            border: none;
+            border-radius: $bdl-border-radius-size;
+            box-shadow: none;
+        }
+    }
+
+    .ba-PopupHighlight-button {
+        @include common-typography;
+
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        padding: 5px 10px;
+        color: $white;
+        background: transparent;
+        border: none;
+        border-radius: $bdl-border-radius-size;
+        cursor: pointer;
+    }
+
+    .ba-PopupHighlight-icon {
+        margin-right: $popup-icon-margin;
+    }
+}
