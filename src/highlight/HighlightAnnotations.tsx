@@ -5,10 +5,11 @@ import HighlightCreator from './HighlightCreator';
 import HighlightList from './HighlightList';
 import HighlightSvg from './HighlightSvg';
 import HighlightTarget from './HighlightTarget';
+import PopupHighlight from '../components/Popups/PopupHighlight';
 import PopupReply from '../components/Popups/PopupReply';
 import { AnnotationHighlight } from '../@types';
 import { CreateArg } from './actions';
-import { CreatorItemHighlight, CreatorStatus, Mode } from '../store';
+import { CreatorItemHighlight, CreatorStatus, Mode, SelectionArg, SelectionItem } from '../store';
 import './HighlightAnnotations.scss';
 
 type Props = {
@@ -19,9 +20,11 @@ type Props = {
     location: number;
     message: string;
     resetCreator: () => void;
+    selection: SelectionItem | null;
     setActiveAnnotationId: (annotationId: string | null) => void;
     setMessage: (message: string) => void;
     setMode: (mode: Mode) => void;
+    setSelection: (selection: SelectionArg | null) => void;
     setStaged: (staged: CreatorItemHighlight | null) => void;
     setStatus: (status: CreatorStatus) => void;
     staged?: CreatorItemHighlight | null;
@@ -36,7 +39,9 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         isCreating = false,
         message,
         resetCreator,
+        selection,
         setActiveAnnotationId,
+        setSelection,
         setMessage,
         staged,
         status,
@@ -64,6 +69,10 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         }
 
         createHighlight({ ...staged, message });
+    };
+
+    const handlePromote = (): void => {
+        setSelection(null);
     };
 
     return (
@@ -97,6 +106,8 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
                     />
                 </div>
             )}
+
+            {!isCreating && selection && <PopupHighlight onClick={handlePromote} rect={selection.boundingRect} />}
         </>
     );
 };
