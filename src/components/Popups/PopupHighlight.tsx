@@ -1,7 +1,7 @@
 import * as React from 'react';
 import noop from 'lodash/noop';
 import { FormattedMessage } from 'react-intl';
-import IconHighlightText from 'box-ui-elements/es/icons/annotations/IconHighlightText';
+import IconHighlightTextAnnotation from 'box-ui-elements/es/icons/annotations/IconHighlightTextAnnotation';
 import messages from './messages';
 import PopupBase from './PopupBase';
 import { DOMRectMini } from '../../store';
@@ -88,7 +88,7 @@ export default function PopupHighlight({ onClick = noop, rect }: Props): JSX.Ele
     return (
         <PopupBase className="ba-PopupHighlight" options={options} reference={reference}>
             <button ref={buttonRef} className="btn-plain ba-PopupHighlight-button" onClick={handleClick} type="button">
-                <IconHighlightText className="ba-PopupHighlight-icon" />
+                <IconHighlightTextAnnotation className="ba-PopupHighlight-icon" />
                 <FormattedMessage {...messages.popupHighlightPromoter} />
             </button>
         </PopupBase>

@@ -40,6 +40,3 @@ export const setSelectionAction = createAction(
         };
     },
 );
-
-// export const clearSelectionAction = (): PayloadAction<SelectionItem | null, 'SET_SELECTION'> =>
-//     setSelectionAction(null);

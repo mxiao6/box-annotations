@@ -106,7 +106,9 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         }
 
         const { location, pageRect, rects } = selection;
-        const { height: pageHeight, width: pageWidth, x: pageX, y: pageY } = pageRect;
+        const { height: pageHeightRaw, width: pageWidth, x: pageX, y: pageYRaw } = pageRect;
+        const pageY = pageYRaw + 15;
+        const pageHeight = pageHeightRaw - 30;
 
         const shapes: Rect[] = filterRects(rects).map(({ height, width, x, y }) => ({
             height: (height / pageHeight) * 100,
@@ -139,7 +141,7 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         setStaged(getStaged());
         setStatus(CreatorStatus.staged);
 
-        clearSelection();
+        setSelection(null);
     }, [isCreating, selection]); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
