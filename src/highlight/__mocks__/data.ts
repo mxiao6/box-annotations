@@ -37,3 +37,21 @@ export const annotation: AnnotationHighlight = {
     target,
     type: 'annotation' as const,
 };
+
+export const selection = {
+    boundingRect: {
+        height: 100,
+        width: 100,
+        x: 200,
+        y: 200,
+    },
+    location: 1,
+    rects: [
+        {
+            height: 100,
+            width: 100,
+            x: 200,
+            y: 200,
+        },
+    ],
+};
