@@ -1,4 +1,4 @@
-import { Annotation, AnnotationHighlight, Position, Shape, Type } from '../@types';
+import { Annotation, AnnotationHighlight, Position, Rect, Shape, Type } from '../@types';
 
 export const getBoundingRect = (shapes: Shape[]): Shape => {
     let minX = Number.MAX_VALUE;
@@ -58,3 +58,59 @@ export const centerHighlight = (shapes: Shape[]): Position => {
 export function isHighlight(annotation: Annotation): annotation is AnnotationHighlight {
     return annotation?.target?.type === Type.highlight;
 }
+
+export const dedupRects = (rects: Shape[]): Shape[] => {
+    const dedupedRects: Shape[] = [];
+
+    rects.forEach(curr => {
+        const prev = dedupedRects.pop();
+        // empty list, push current
+        if (!prev) {
+            dedupedRects.push(curr);
+            return;
+        }
+
+        // the same rect, push the larger one
+        if (prev.x === curr.x && prev.width === curr.width && Math.abs(prev.y - curr.y) <= 2) {
+            dedupedRects.push(prev.height > curr.height ? prev : curr);
+            return;
+        }
+
+        // different rects, push both
+        dedupedRects.push(prev);
+        dedupedRects.push(curr);
+    });
+
+    return dedupedRects;
+};
+
+export const groupByRow = (shapes: Shape[]): Record<number, Shape[]> => {
+    const rows: Record<number, Shape[]> = {};
+    shapes.forEach(shape => {
+        const { y } = shape;
+        if (!rows[y]) {
+            rows[y] = [shape];
+        } else {
+            rows[y].push(shape);
+        }
+    });
+
+    return rows;
+};
+
+export const combineRows = (allShapes: Shape[]): Shape[] => {
+    const dedupedRects = dedupRects(allShapes);
+    const rowMap = groupByRow(dedupedRects);
+    return Object.values(rowMap).map(shapes => getBoundingRect(shapes));
+};
+
+export const getRelativeRect = (
+    { height, width, x, y }: Shape,
+    { height: containerHeight, width: containerWidth, x: containerX, y: containerY }: Shape,
+): Rect => ({
+    height: (height / containerHeight) * 100,
+    type: 'rect',
+    width: (width / containerWidth) * 100,
+    x: ((x - containerX) / containerWidth) * 100,
+    y: ((y - containerY) / containerHeight) * 100,
+});

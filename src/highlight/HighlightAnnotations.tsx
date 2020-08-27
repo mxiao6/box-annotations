@@ -7,7 +7,8 @@ import HighlightSvg from './HighlightSvg';
 import HighlightTarget from './HighlightTarget';
 import PopupHighlight from '../components/Popups/PopupHighlight';
 import PopupReply from '../components/Popups/PopupReply';
-import { AnnotationHighlight } from '../@types';
+import { AnnotationHighlight, Rect } from '../@types';
+import { combineRows, getRelativeRect } from './highlightUtil';
 import { CreateArg } from './actions';
 import { CreatorItemHighlight, CreatorStatus, Mode, SelectionArg, SelectionItem } from '../store';
 import './HighlightAnnotations.scss';
@@ -43,6 +44,9 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
         setActiveAnnotationId,
         setSelection,
         setMessage,
+        setMode,
+        setStaged,
+        setStatus,
         staged,
         status,
     } = props;
@@ -72,6 +76,17 @@ const HighlightAnnotations = (props: Props): JSX.Element => {
     };
 
     const handlePromote = (): void => {
+        if (!selection) {
+            return;
+        }
+
+        const { location, containerRect, rects } = selection;
+        const shapes: Rect[] = combineRows(rects).map(rect => getRelativeRect(rect, containerRect));
+
+        setMode(Mode.HIGHLIGHT);
+        setStaged({ location, shapes });
+        setStatus(CreatorStatus.staged);
+
         setSelection(null);
     };
 

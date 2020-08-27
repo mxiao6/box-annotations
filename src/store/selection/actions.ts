@@ -3,6 +3,7 @@ import { SelectionItem } from './types';
 import { Shape } from '../../@types';
 
 export type SelectionArg = {
+    containerRect: DOMRect;
     location: number;
     range: Range;
 };
@@ -27,12 +28,13 @@ export const setSelectionAction = createAction(
             };
         }
 
-        const { location, range } = arg;
+        const { location, containerRect, range } = arg;
 
         return {
             payload: {
                 boundingRect: getShape(range.getBoundingClientRect()),
                 location,
+                containerRect: getShape(containerRect),
                 rects: Array.from(range.getClientRects()).map(getShape),
             },
         };
