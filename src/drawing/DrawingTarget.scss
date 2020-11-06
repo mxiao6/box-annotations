@@ -1,0 +1,24 @@
+$ba-DrawingTarget-transitionDelay: 25ms;
+$ba-DrawingTarget-transitionDuration: 200ms;
+
+.ba-DrawingTarget {
+    outline: none;
+
+    &:hover {
+        cursor: pointer;
+
+        .ba-DrawingTarget-decoration {
+            opacity: 1;
+        }
+    }
+
+    .ba-DrawingTarget-decoration {
+        opacity: 0;
+        transition: opacity $ba-DrawingTarget-transitionDuration ease;
+
+        &.is-active {
+            opacity: 1;
+            transition-delay: $ba-DrawingTarget-transitionDelay;
+        }
+    }
+}

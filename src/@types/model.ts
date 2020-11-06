@@ -36,6 +36,14 @@ export interface Page {
     value: number;
 }
 
+export interface Path {
+    points: Array<Position>;
+}
+export interface PathGroup {
+    paths: Array<Path>;
+    stroke: Stroke;
+}
+
 export interface Position {
     x: number;
     y: number;
@@ -79,12 +87,7 @@ export type Target = TargetDrawing | TargetHighlight | TargetPoint | TargetRegio
 
 export interface TargetDrawing {
     location: Page;
-    paths: [
-        {
-            points: [Position];
-        },
-    ];
-    stroke: Stroke;
+    path_groups: Array<PathGroup>;
     type: 'drawing';
 }
 

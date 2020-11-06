@@ -1,4 +1,4 @@
-import { Rect, SerializedError, Shape } from '../../@types';
+import { Position, Rect, SerializedError, Shape, Stroke } from '../../@types';
 
 export enum CreatorStatus {
     init = 'init',
@@ -20,7 +20,14 @@ export type CreatorItemHighlight = CreatorItemBase & {
     shapes: Rect[];
 };
 
-export type CreatorItem = CreatorItemRegion | CreatorItemHighlight | null;
+export type CreatorItemDrawing = CreatorItemBase & {
+    paths: Array<{
+        points: Array<Position>;
+    }>;
+    stroke: Stroke;
+};
+
+export type CreatorItem = CreatorItemRegion | CreatorItemHighlight | CreatorItemDrawing | null;
 
 export type CreatorState = {
     cursor: number;
