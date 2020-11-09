@@ -31,6 +31,11 @@ export interface AnnotationRegion extends Annotation {
     target: TargetRegion;
 }
 
+export type Dimensions = {
+    height: number;
+    width: number;
+};
+
 export interface Page {
     type: 'page';
     value: number;
