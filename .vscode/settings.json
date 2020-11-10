@@ -3,6 +3,7 @@
     "prettier.printWidth": 120,
     "prettier.singleQuote": true,
     "prettier.tabWidth": 4,
+    "scss.lint.unknownProperties": "ignore",
     "typescript.format.enable": true,
     "typescript.validate.enable": true
 }

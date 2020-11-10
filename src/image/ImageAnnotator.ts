@@ -4,6 +4,7 @@ import PopupManager from '../popup/PopupManager';
 import { getAnnotation, getRotation } from '../store';
 import { centerRegion, getTransformedShape, isRegion, RegionCreationManager, RegionManager } from '../region';
 import { CreatorStatus, getCreatorStatus } from '../store/creator';
+import { DrawingManager } from '../drawing';
 import { Manager } from '../common/BaseManager';
 import { scrollToLocation } from '../utils/scroll';
 import './ImageAnnotator.scss';
@@ -49,6 +50,9 @@ export default class ImageAnnotator extends BaseAnnotator {
 
         if (this.managers.size === 0) {
             this.managers.add(new PopupManager({ referenceEl }));
+            if (this.isFeatureEnabled('drawing')) {
+                this.managers.add(new DrawingManager({ referenceEl }));
+            }
             this.managers.add(new RegionManager({ referenceEl }));
             this.managers.add(new RegionCreationManager({ referenceEl }));
         }

@@ -3,7 +3,7 @@ import classNames from 'classnames';
 import noop from 'lodash/noop';
 import DrawingTarget from './DrawingTarget';
 import useOutsideEvent from '../common/useOutsideEvent';
-import { AnnotationDrawing } from '../@types';
+import { AnnotationDrawing, Dimensions } from '../@types';
 import { checkValue } from '../utils/util';
 import { getShape } from './drawingUtil';
 
@@ -30,6 +30,7 @@ export function sortDrawing({ target: targetA }: AnnotationDrawing, { target: ta
 
 export function DrawingList({ activeId = null, annotations, className, onSelect = noop }: Props): JSX.Element {
     const [isListening, setIsListening] = React.useState(true);
+    const [rootDimensions, setRootDimensions] = React.useState<Dimensions>();
     const rootElRef = React.createRef<SVGSVGElement>();
 
     // Document-level event handlers for focus and pointer control
@@ -38,6 +39,17 @@ export function DrawingList({ activeId = null, annotations, className, onSelect 
         setIsListening(false);
     });
     useOutsideEvent('mouseup', rootElRef, (): void => setIsListening(true));
+
+    React.useEffect(() => {
+        const { current: rootEl } = rootElRef;
+        if (!rootEl) {
+            return;
+        }
+        setRootDimensions({
+            height: rootEl.clientHeight,
+            width: rootEl.clientWidth,
+        });
+    }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
     return (
         <svg
@@ -55,18 +67,20 @@ export function DrawingList({ activeId = null, annotations, className, onSelect 
                     </feComponentTransfer>
                 </filter>
             </defs>
-            {annotations
-                .filter(filterDrawing)
-                .sort(sortDrawing)
-                .map(({ id, target }) => (
-                    <DrawingTarget
-                        key={id}
-                        annotationId={id}
-                        isActive={activeId === id}
-                        onSelect={onSelect}
-                        target={target}
-                    />
-                ))}
+            {rootDimensions &&
+                annotations
+                    .filter(filterDrawing)
+                    .sort(sortDrawing)
+                    .map(({ id, target }) => (
+                        <DrawingTarget
+                            key={id}
+                            annotationId={id}
+                            isActive={activeId === id}
+                            onSelect={onSelect}
+                            rootDimensions={rootDimensions}
+                            target={target}
+                        />
+                    ))}
         </svg>
     );
 }

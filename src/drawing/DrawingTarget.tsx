@@ -4,10 +4,10 @@ import classNames from 'classnames';
 import noop from 'lodash/noop';
 import { white } from 'box-ui-elements/es/styles/variables';
 import { MOUSE_PRIMARY } from '../constants';
-import { Path, Stroke, TargetDrawing } from '../@types';
+import { Dimensions, Path, Stroke, TargetDrawing } from '../@types';
 import { Point } from '../region/transformUtil';
+import { getCenter, getShape, vectorEffectSupported } from './drawingUtil';
 import { getIsCurrentFileVersion } from '../store';
-import { getShape } from './drawingUtil';
 import './DrawingTarget.scss';
 
 type Props = {
@@ -15,6 +15,7 @@ type Props = {
     className?: string;
     isActive?: boolean;
     onSelect?: (annotationId: string) => void;
+    rootDimensions: Dimensions;
     target: TargetDrawing;
 };
 
@@ -51,27 +52,37 @@ export const getSVGPath = (points: Point[]): string => {
     return `M ${startX} ${startY} ${d}`;
 };
 
-export const getSVGTarget = (paths: Path[], { color, size }: Stroke, isActive: boolean): JSX.Element => (
-    <g className="be-DrawingTarget-group" fill="transparent" stroke={color} strokeWidth={size}>
-        {paths.map(({ points }) => {
-            const d = getSVGPath(points);
-            return (
-                <>
-                    <g className={classNames('ba-DrawingTarget-decoration', { 'is-active': isActive })}>
-                        <path d={d} filter="url(#ba-DrawingList-shadow)" vectorEffect="non-scaling-stroke" />
-                        <path
-                            d={d}
-                            stroke={white}
-                            strokeWidth={size + DRAWING_TARGET_BORDER * 2}
-                            vectorEffect="non-scaling-stroke"
-                        />
-                    </g>
-                    <path d={d} vectorEffect="non-scaling-stroke" />
-                </>
-            );
-        })}
-    </g>
-);
+export const getSVGTarget = (
+    paths: Path[],
+    { color, size }: Stroke,
+    isActive: boolean,
+    { width }: Dimensions,
+): JSX.Element => {
+    let strokeWidth = size;
+    let strokeBorderWidth = size + DRAWING_TARGET_BORDER * 2;
+
+    if (!vectorEffectSupported()) {
+        strokeWidth /= width / 100;
+        strokeBorderWidth /= width / 100;
+    }
+
+    return (
+        <g fill="transparent" stroke={color} strokeWidth={strokeWidth}>
+            {paths.map(({ points }) => {
+                const d = getSVGPath(points);
+                return (
+                    <>
+                        <g className={classNames('ba-DrawingTarget-decoration', { 'is-active': isActive })}>
+                            <path d={d} filter="url(#ba-DrawingList-shadow)" />
+                            <path d={d} stroke={white} strokeWidth={strokeBorderWidth} />
+                        </g>
+                        <path d={d} />
+                    </>
+                );
+            })}
+        </g>
+    );
+};
 
 export const DrawingTarget = (props: Props, ref: React.Ref<DrawingTargetRef>): JSX.Element => {
     const isCurrentFileVersion = ReactRedux.useSelector(getIsCurrentFileVersion);
@@ -80,11 +91,11 @@ export const DrawingTarget = (props: Props, ref: React.Ref<DrawingTargetRef>): J
         className,
         isActive = false,
         onSelect = noop,
+        rootDimensions,
         target: { path_groups: pathGroups },
     } = props;
-    const { height, width, x, y } = getShape(pathGroups);
-    const centerX = x + width / 2;
-    const centerY = y + height / 2;
+    const shape = getShape(pathGroups);
+    const { x: centerX, y: centerY } = getCenter(shape);
 
     const handleFocus = (): void => {
         onSelect(annotationId);
@@ -94,8 +105,6 @@ export const DrawingTarget = (props: Props, ref: React.Ref<DrawingTargetRef>): J
             return;
         }
         const activeElement = document.activeElement as HTMLElement;
-
-        onSelect(annotationId);
 
         event.preventDefault(); // Prevents focus from leaving the button immediately in some browsers
         event.nativeEvent.stopImmediatePropagation(); // Prevents document event handlers from executing
@@ -107,6 +116,8 @@ export const DrawingTarget = (props: Props, ref: React.Ref<DrawingTargetRef>): J
         }
 
         event.currentTarget.focus(); // Buttons do not receive focus in Firefox and Safari on MacOS; triggers handleFocus
+
+        onSelect(annotationId);
     };
 
     return (
@@ -126,13 +137,10 @@ export const DrawingTarget = (props: Props, ref: React.Ref<DrawingTargetRef>): J
         >
             <rect
                 fill="transparent"
-                height={height}
                 transform={`translate(-${centerX * 0.1}, -${centerY * 0.1}) scale(1.1)`}
-                width={width}
-                x={x}
-                y={y}
+                {...shape}
             />
-            {pathGroups.map(({ paths, stroke }) => getSVGTarget(paths, stroke, isActive))}
+            {pathGroups.map(({ paths, stroke }) => getSVGTarget(paths, stroke, isActive, rootDimensions))}
         </a>
     );
 };

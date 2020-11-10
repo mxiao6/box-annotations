@@ -1,4 +1,8 @@
-import { Annotation, AnnotationDrawing, PathGroup, Shape } from '../@types';
+import { Annotation, AnnotationDrawing, PathGroup, Position, Shape } from '../@types';
+
+export function getCenter({ height, width, x, y }: Shape): Position {
+    return { x: x + width / 2, y: y + height / 2 };
+}
 
 export function getShape(pathGroups: PathGroup[]): Shape {
     let maxX = 0;
@@ -27,4 +31,8 @@ export function getShape(pathGroups: PathGroup[]): Shape {
 
 export function isDrawing(annotation: Annotation): annotation is AnnotationDrawing {
     return annotation?.target?.type === 'drawing';
+}
+
+export function vectorEffectSupported(): boolean {
+    return 'vector-effect' in document.body.style;
 }

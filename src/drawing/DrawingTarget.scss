@@ -4,6 +4,10 @@ $ba-DrawingTarget-transitionDuration: 200ms;
 .ba-DrawingTarget {
     outline: none;
 
+    path {
+        vector-effect: non-scaling-stroke;
+    }
+
     &:hover {
         cursor: pointer;
 
